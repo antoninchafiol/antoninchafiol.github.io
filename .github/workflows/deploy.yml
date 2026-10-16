@@ -1,6 +1,4 @@
 name: Deploy to GitHub Pages
-
-
 on:
   push:
     branches: [main]
@@ -17,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: withastro/action@v3
+        with:
+            node-version: 22
 
   deploy:
     needs: build
