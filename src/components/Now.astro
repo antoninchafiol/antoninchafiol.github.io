@@ -1,0 +1,60 @@
+---
+const now = [
+  { label: "Building", text: "A pipeline for my own email and documents." },
+  { label: "Learning", text: "Database replication and failover, DevOps and self-hosted infrastructure, and a bit of async Rust. Making failure modes boring." },
+  { label: "Playing", text: "Guitar (badly, happily) on a Jet JT400 HSS/Vox VT40X and the odd Factorio factory." },
+];
+---
+<section id="now" class="now section">
+<p class="eyebrow">03 / NOW</p>
+<h2>What I'm up to<span>.</span></h2>
+<dl class="now-list">
+    {now.map((item) => (
+    <div class="now-row">
+        <dt>{item.label}</dt>
+        <dd>{item.text}</dd>
+    </div>
+    ))}
+</dl>
+</section>
+
+<style>
+  .now {
+    border-top: 1px solid var(--border);
+  }
+
+  .now-list {
+    margin: 36px 0 0;
+    max-width: 760px;
+  }
+
+  .now-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    padding: 18px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .now-row:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .now-row dt {
+    color: var(--accent-text);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .now-row dd {
+    margin: 0;
+    color: var(--body);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 760px) {
+    .now-row { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>

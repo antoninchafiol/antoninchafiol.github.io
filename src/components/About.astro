@@ -1,0 +1,295 @@
+---
+import { Image } from "astro:assets";
+import me from "../assets/perso_1.jpg"; // placeholder: swap for ../assets/me.jpg
+import { jobs } from "../data/jobs";
+import { education } from "../data/education";
+
+const bio =
+  "I love optimizing things, but carefully: reversible changes, dry runs, logs for everything. Three years on a medical PACS taught me what’s at stake when data can’t be lost. Small, deliberate improvements, repeated.";
+
+let n = 0;
+const groups = [
+  { label: "Experience", items: jobs },
+  { label: "Education", items: education },
+]
+  .filter((g) => g.items.length > 0)
+  .map((g) => ({ ...g, items: g.items.map((item) => ({ ...item, id: `p${n++}` })) }));
+---
+
+<section id="about" class="about section">
+  <p class="eyebrow">02 / ABOUT</p>
+  <h2>
+    Curious by nature.<br />
+    <span class="muted">Careful by habit.</span>
+  </h2>
+
+  <div class="profile" data-profile>
+    <div class="profile-list">
+      {groups.map((g) => (
+        <div class="group">
+          <p class="eyebrow">{g.label.toUpperCase()}</p>
+          {g.items.map((item) => (
+            <button type="button" class="entry" data-target={item.id} aria-pressed="false">
+              <span class="period">{item.period}</span>
+              <span class="title">{item.title}</span>
+              <span class="org">{item.org}</span>
+            </button>
+          ))}
+        </div>
+      ))}
+    </div>
+
+    <aside class="profile-card">
+      <Image src={me} alt="Portrait of me" width={320} height={320} class="photo" />
+
+      <div class="detail" data-panel="bio">
+        <p class="bio">{bio}</p>
+      </div>
+
+      {groups.flatMap((g) => g.items).map((item) => (
+        <div class="detail" data-panel={item.id} hidden>
+          <p class="detail-period">{item.period}</p>
+          <h3>{item.title}</h3>
+          <p class="detail-org">{item.org}</p>
+          <p class="bio">{item.summary}</p>
+          {item.points && (
+            <ul class="points">{item.points.map((p) => <li>{p}</li>)}</ul>
+          )}
+          {item.stack && (
+            <div class="tags">{item.stack.map((s) => <span>{s}</span>)}</div>
+          )}
+        </div>
+      ))}
+    </aside>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-profile]");
+  if (root) {
+    const buttons = root.querySelectorAll<HTMLButtonElement>("[data-target]");
+    const panels = root.querySelectorAll<HTMLElement>("[data-panel]");
+
+    const show = (id: string) => {
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+      buttons.forEach((b) =>
+        b.setAttribute("aria-pressed", String(b.dataset.target === id))
+      );
+    };
+
+    buttons.forEach((b) =>
+      b.addEventListener("click", () => {
+        const active = b.getAttribute("aria-pressed") === "true";
+        show(active ? "bio" : b.dataset.target!);
+      })
+    );
+  }
+</script>
+
+<style>
+  .about {
+    border-top: 1px solid var(--border);
+  }
+
+  .about h2 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .profile {
+    display: flex;
+    gap: 56px;
+    align-items: flex-start;
+    margin-top: 48px;
+  }
+
+  .profile-list {
+    flex: 0 0 340px;
+    display: grid;
+    gap: 36px;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .group .eyebrow {
+    margin: 0 0 10px;
+  }
+
+  .entry {
+    all: unset;
+    box-sizing: border-box;
+    display: grid;
+    gap: 4px;
+    padding: 16px 18px 16px 20px;
+    border-left: 2px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .entry:hover {
+    background: rgba(140, 42, 74, 0.1);
+  }
+
+  .entry:focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: -2px;
+  }
+
+  .entry[aria-pressed="true"] {
+    border-left-color: var(--accent-text);
+    background: var(--surface);
+  }
+
+  .period {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .entry[aria-pressed="true"] .period {
+    color: var(--accent-text);
+  }
+
+  .title {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .org {
+    font-size: 0.82rem;
+    color: var(--body);
+  }
+
+  .profile-card {
+    flex: 1;
+    position: sticky;
+    top: 100px;
+    background:
+      radial-gradient(ellipse at 90% 0%, rgba(140, 42, 74, 0.22), transparent 55%),
+      var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 36px;
+  }
+
+  .profile-card :global(.photo) {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 28px;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 0 6px rgba(140, 42, 74, 0.18);
+  }
+  .photo {
+    display: block;
+    margin-inline: auto;
+  }
+    .profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .detail {
+    animation: fade 0.25s ease;
+  }
+
+  .detail-period {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    color: var(--accent-text);
+  }
+
+  .detail h3 {
+    margin: 10px 0 4px;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+  }
+
+  .detail-org {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .bio {
+    margin: 0;
+    color: var(--body);
+    line-height: 1.8;
+    max-width: 62ch;
+  }
+
+  .points {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .points li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--body);
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .points li::before {
+    content: "›";
+    position: absolute;
+    left: 4px;
+    color: var(--accent-text);
+    font-family: var(--mono);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .tags span {
+    border: 1px solid var(--border);
+    color: var(--body);
+    padding: 5px 9px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    border-radius: 4px;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 860px) {
+    .profile {
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .profile-list {
+      flex: none;
+      width: 100%;
+    }
+
+    .profile-card {
+      order: -1;
+      position: static;
+      width: 100%;
+      padding: 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail { animation: none; }
+  }
+</style>
